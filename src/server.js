@@ -13,12 +13,15 @@ createServer(async (req, res) => {
         try {
             switch (endpoint) {
                 case 'GET:/blockchain':
+                    console.log('GET request received on /blockchain endpoint')
                     results = await liste(req, res, url)
                     break
                 case 'POST:/blockchain':
+                    console.log('POST request received on /blockchain endpoint')
                     results = await create(req, res)
                     break
                 default :
+                    console.log('404 - Endpoint not found')
                     res.writeHead(404)
             }
             if (results) {
@@ -33,4 +36,4 @@ createServer(async (req, res) => {
         }
         res.end()
     }
-).listen(3000)
+).listen(5555)
