@@ -53,14 +53,32 @@ export async function findBlock(partialBlock) {
         const existingBlocks = await findBlocks();
 
         if (existingBlocks.length === 0) {
-            // Empty or invalid blockchain
+            // Empty blockchain
             return [];
         }
 
         // Search for the block with the specified ID
         const targetBlock = existingBlocks.find((block) => block.id === partialBlock);
 
-        return targetBlock || []; // Return the found block or [] if not found
+        if (!targetBlock) {
+            return {
+                "status": "error",
+                "message": "Block not found."
+            };
+        }
+
+        // Vérifie la fiabilité du bloc
+        const isReliable=verifBlocks();
+
+        if (isReliable) {
+            return targetBlock;
+        } else {
+            return {
+                "status": "error",
+                "message": "Block is not reliable."
+            };
+        }
+
     } catch (error) {
         console.error('Erreur lors de la recherche du bloc par ID', error);
         throw error;
@@ -153,7 +171,7 @@ export async function verifBlocks() {
         const existingBlocks = await findBlocks();
 
         if (existingBlocks.length === 0) {
-            // Empty or invalid blockchain
+            // Empty blockchain
             return false;
         }
 
