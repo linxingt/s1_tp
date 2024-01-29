@@ -58,7 +58,7 @@ export async function findBlock(partialBlock) {
         }
 
         // Search for the block with the specified ID
-        const targetBlock = existingBlocks.find((block) => block.id === partialBlock);
+        const targetBlock = existingBlocks.find((block) => block.id === partialBlock.id);
 
         if (!targetBlock) {
             return {
@@ -143,7 +143,7 @@ export async function createBlock(contenu) {
             nom: contenu.nom,
             don: contenu.don,
             date: currentDate,
-            hash: lastBlock ? calculateHash({id: newBlockId, nom: contenu.nom, don: contenu.don, date: currentDate, previousHash}): calculateHash(monSecret),
+            hash: lastBlock ? calculateHash({id: newBlockId, nom: contenu.nom, don: contenu.don, date: currentDate, previousHash: previousHash}): calculateHash(monSecret),
             previousHash,
         };
         const existingBlocks = await findBlocks();
@@ -172,6 +172,7 @@ export async function verifBlocks() {
 
         if (existingBlocks.length === 0) {
             // Empty blockchain
+            console.log("false",existingBlocks.length);
             return false;
         }
 
@@ -181,11 +182,23 @@ export async function verifBlocks() {
             const previousBlock = existingBlocks[i - 1];
 
             // Check if the hash of the previous block matches the 'previousHash' field of the current block
-            if (calculateHash(previousBlock) !== currentBlock.previousHash) {
-                return false; // Integrity compromised
+            if(i === 1){
+                if (calculateHash(monSecret) !== currentBlock.previousHash) {
+                    console.log("false",i);
+                    return false; // Integrity compromised
+                }
+            }else{
+                if (calculateHash({id: previousBlock.id, nom: previousBlock.nom, don: previousBlock.don, date: previousBlock.date, previousHash: previousBlock.previousHash}) !== currentBlock.previousHash) {
+                    console.log(currentBlock);
+                    console.log(previousBlock);
+                    console.log(currentBlock.previousHash);
+                    console.log(calculateHash({id: previousBlock.id, nom: previousBlock.nom, don: previousBlock.don, date: previousBlock.date, previousHash: previousBlock.previousHash}));
+                    console.log("false",i);
+                    return false; // Integrity compromised
+                }
             }
         }
-
+        console.log("true");
         return true; // Blockchain is intact
     } catch (error) {
         console.error('Erreur lors de la vérification de l\'intégrité de la chaîne', error);

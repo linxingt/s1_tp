@@ -1,6 +1,6 @@
 
 import {createServer} from "node:http"
-import {create, liste} from "./blockchain.js";
+import {create, find, liste, check} from "./blockchain.js";
 import {NotFoundError} from "./errors.js";
 
 createServer(async (req, res) => {
@@ -19,6 +19,10 @@ createServer(async (req, res) => {
                 case 'POST:/blockchain':
                     console.log('POST request received on /blockchain endpoint')
                     results = await create(req, res)
+                    break
+                case 'PUT:/blockchain':
+                    // results = await find(req, res)
+                    results = await check(req, res)
                     break
                 default :
                     console.log('404 - Endpoint not found')
